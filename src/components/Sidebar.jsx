@@ -9,12 +9,12 @@ import { useThemeStore } from '../store/useThemeStore';
 
 const NavItem = ({ icon: Icon, label, to, active, onClick }) => (
   <Link to={to || '#'} onClick={onClick}
-    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group ${
-      active ? 'bg-accent/15 text-accent' : 'text-text-secondary hover:text-foreground hover:bg-secondary'
+    className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-2 py-2 md:px-3 md:py-2.5 rounded-xl transition-all flex-1 md:flex-none ${
+      active ? 'bg-accent/10 md:bg-accent/15 text-accent' : 'text-text-secondary hover:text-foreground hover:bg-secondary'
     }`}
   >
-    <Icon className="w-5 h-5 flex-shrink-0" />
-    <span className="hidden md:block text-sm font-medium">{label}</span>
+    <Icon className="w-6 h-6 md:w-5 md:h-5 flex-shrink-0" />
+    <span className="text-[10px] md:text-sm font-medium">{label}</span>
   </Link>
 );
 
@@ -41,10 +41,9 @@ const Sidebar = ({ profile, streak, onScanClick }) => {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-16 md:w-60 bg-background border-r border-border z-30 flex flex-col transition-colors duration-300">
-      <div className="p-4 md:p-6 py-5 flex items-center justify-center md:justify-start">
-        <img src="/logo.png" alt="FitSadhana" className="h-10 object-contain hidden md:block" />
-        <img src="/favicon.png" alt="FS" className="h-8 object-contain md:hidden" />
+    <aside className="fixed bottom-0 left-0 w-full md:w-60 h-16 md:h-full bg-background/90 md:bg-background backdrop-blur-md md:backdrop-blur-none border-t md:border-t-0 md:border-r border-border z-50 flex flex-row md:flex-col transition-colors duration-300">
+      <div className="hidden md:flex p-6 py-5 items-center justify-start">
+        <img src="/logo.png" alt="FitSadhana" className="h-10 object-contain" />
       </div>
 
       {/* User avatar */}
@@ -58,11 +57,11 @@ const Sidebar = ({ profile, streak, onScanClick }) => {
         </div>
       </div>
 
-      <nav className="flex-1 px-2 md:px-3 space-y-1 overflow-y-auto">
+      <nav className="flex-1 flex flex-row md:flex-col items-center md:items-stretch justify-around md:justify-start px-2 md:px-3 md:space-y-1 w-full overflow-x-auto md:overflow-y-auto hide-scrollbar">
         <NavItem icon={Activity} label="Dashboard" to="/dashboard" active={isActive('/dashboard')} />
         <NavItem icon={Dumbbell} label="Workout" to="/workout" active={isActive('/workout')} />
         <NavItem icon={Calendar} label="Calendar" to="/calendar" active={isActive('/calendar')} />
-        <NavItem icon={ScanLine} label="Scan Food" to="/scanner" active={isActive('/scanner')} />
+        <NavItem icon={ScanLine} label="Scan" to="/scanner" active={isActive('/scanner')} />
         <NavItem icon={Settings} label="Profile" to="/profile" active={isActive('/profile')} />
       </nav>
 
@@ -75,7 +74,7 @@ const Sidebar = ({ profile, streak, onScanClick }) => {
         </div>
       )}
 
-      <div className="p-2 md:p-3 space-y-2">
+      <div className="hidden md:block p-3 space-y-2">
         <div className="px-3 py-2 bg-secondary rounded-xl flex items-center justify-between">
           <div className="flex gap-2">
             {themes.map((t) => (
@@ -88,25 +87,26 @@ const Sidebar = ({ profile, streak, onScanClick }) => {
                   borderColor: theme === t.id && !customAccent ? 'var(--accent)' : 'transparent' 
                 }}
                 title={`Switch to ${t.id} mode`}
-              >
-                {theme === t.id && !customAccent && <Check className="w-3 h-3 text-gray-500 mix-blend-difference" />}
-              </button>
+                aria-label={`Switch to ${t.id} mode`}
+              />
             ))}
           </div>
-          <div className="flex items-center gap-2">
-            <div className="relative w-6 h-6 rounded-full overflow-hidden border-2 border-transparent hover:scale-110 transition-transform" title="Custom Accent Color">
-              <input 
-                type="color" 
-                value={tempColor} 
-                onChange={(e) => setTempColor(e.target.value)}
-                className="absolute inset-0 w-[150%] h-[150%] -top-1 -left-1 cursor-pointer"
-              />
-            </div>
-            {tempColor !== (customAccent || '#3b82f6') && (
-              <button 
-                onClick={() => setCustomAccent(tempColor)}
-                className="text-xs bg-accent text-white px-2 py-1 rounded-md font-medium hover:opacity-90 active:scale-95"
-              >
+          <div className="flex items-center gap-2 border-l border-border pl-2">
+            <input
+              type="color"
+              value={tempColor}
+              onChange={(e) => setTempColor(e.target.value)}
+              className="w-6 h-6 p-0 border-0 rounded-full cursor-pointer bg-transparent"
+              title="Pick custom accent color"
+              aria-label="Pick custom accent color"
+            />
+            {customAccent && (
+              <button onClick={() => { setCustomAccent(null); setTempColor('#3b82f6'); }} className="text-[10px] text-text-secondary hover:text-foreground px-1 py-0.5 rounded bg-foreground/5">
+                Reset
+              </button>
+            )}
+            {!customAccent && tempColor !== '#3b82f6' && (
+              <button onClick={() => setCustomAccent(tempColor)} className="text-[10px] bg-accent text-white px-1 py-0.5 rounded">
                 Apply
               </button>
             )}
@@ -115,9 +115,10 @@ const Sidebar = ({ profile, streak, onScanClick }) => {
         <button
           onClick={logout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-text-secondary hover:text-red-500 hover:bg-red-500/10 transition-all"
+          aria-label="Logout"
         >
           <LogOut className="w-5 h-5 flex-shrink-0" />
-          <span className="hidden md:block text-sm font-medium">Logout</span>
+          <span className="text-sm font-medium">Logout</span>
         </button>
       </div>
     </aside>

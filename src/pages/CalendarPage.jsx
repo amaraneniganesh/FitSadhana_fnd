@@ -83,11 +83,11 @@ export default function CalendarPage() {
     <div className="flex justify-between items-center mb-6">
       <h2 className="text-2xl font-bold">{format(currentMonth, 'MMMM yyyy')}</h2>
       <div className="flex gap-2">
-        <button onClick={prevMonth} className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-          <ChevronLeft className="w-5 h-5 text-gray-300" />
+        <button onClick={prevMonth} className="w-10 h-10 rounded-xl bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors" aria-label="Previous Month">
+          <ChevronLeft className="w-5 h-5 text-text-secondary" />
         </button>
-        <button onClick={nextMonth} className="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-          <ChevronRight className="w-5 h-5 text-gray-300" />
+        <button onClick={nextMonth} className="w-10 h-10 rounded-xl bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors" aria-label="Next Month">
+          <ChevronRight className="w-5 h-5 text-text-secondary" />
         </button>
       </div>
     </div>
@@ -98,7 +98,7 @@ export default function CalendarPage() {
     const startDate = startOfWeek(currentMonth);
     for (let i = 0; i < 7; i++) {
       days.push(
-        <div className="text-center font-semibold text-gray-400 text-sm py-2" key={i}>
+        <div className="text-center font-semibold text-text-secondary text-sm py-2" key={i}>
           {format(addDays(startDate, i), 'EEE')}
         </div>
       );
@@ -128,11 +128,11 @@ export default function CalendarPage() {
         days.push(
           <div
             className={`p-2 flex flex-col items-center justify-center min-h-[80px] rounded-2xl cursor-pointer transition-all border ${
-              !isCurrentMonth ? 'text-gray-600 border-transparent opacity-50' : 
+              !isCurrentMonth ? 'text-text-secondary border-transparent opacity-50' : 
               isSelected ? 'bg-accent/20 border-accent text-accent shadow-[0_0_15px_var(--accent)] z-10' :
               hasWorkout ? 'bg-green-500/10 border-green-500/30 text-white hover:border-green-500/50' :
-              isDayToday ? 'bg-white/10 border-white/20 text-white' :
-              'bg-white/3 border-transparent hover:border-white/10 text-gray-300'
+              isDayToday ? 'bg-foreground/10 border-border text-white' :
+              'bg-foreground/3 border-transparent hover:border-border text-text-secondary'
             }`}
             key={day.toString()}
             onClick={() => handleDayClick(cloneDay)}
@@ -171,16 +171,16 @@ export default function CalendarPage() {
   const sleepHours = getSleepHours();
 
   return (
-    <div className="min-h-screen bg-background text-white flex">
+    <div className="min-h-screen bg-background text-foreground flex">
       <div className="fixed top-[-10%] right-[-5%] w-[500px] h-[500px] bg-accent/6 rounded-full blur-[150px] pointer-events-none z-0" />
       <div className="fixed bottom-[-10%] left-[10%] w-[400px] h-[400px] bg-violet-600/5 rounded-full blur-[130px] pointer-events-none z-0" />
 
       <Sidebar profile={profile} streak={streak} />
 
-      <main className="ml-16 md:ml-60 flex-1 p-4 md:p-8 relative z-10 w-full overflow-hidden">
+      <main className="ml-0 md:ml-60 flex-1 p-4 md:p-8 relative z-10 w-full overflow-hidden">
         <div className="mb-7">
           <h1 className="text-xl md:text-2xl font-bold tracking-tight">Your Calendar</h1>
-          <p className="text-gray-500 text-sm">Review your historical fitness data</p>
+          <p className="text-text-secondary text-sm">Review your historical fitness data</p>
         </div>
 
         <div className="flex flex-col xl:flex-row gap-6">
@@ -193,7 +193,7 @@ export default function CalendarPage() {
               {renderCells()}
             </div>
             
-            <div className="mt-4 flex gap-5 text-xs text-gray-500 px-4">
+            <div className="mt-4 flex gap-5 text-xs text-text-secondary px-4">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
                 Workout Completed
@@ -203,7 +203,7 @@ export default function CalendarPage() {
                 Selected Date
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-white/10 border border-white/20"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-foreground/10 border border-border"></span>
                 Rest Day
               </div>
             </div>
@@ -222,9 +222,9 @@ export default function CalendarPage() {
                   <div className="flex justify-between items-center mb-6 sticky top-0 bg-background/80 backdrop-blur-md pb-2 z-10">
                     <div>
                       <h3 className="font-bold text-lg">{format(date, 'MMMM d, yyyy')}</h3>
-                      <p className="text-xs text-gray-400">{isSameDay(date, new Date()) ? 'Today' : format(date, 'EEEE')}</p>
+                      <p className="text-xs text-text-secondary">{isSameDay(date, new Date()) ? 'Today' : format(date, 'EEEE')}</p>
                     </div>
-                    <button onClick={() => setShowPanel(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors">
+                    <button onClick={() => setShowPanel(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-foreground/5 hover:bg-foreground/10 transition-colors">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -252,67 +252,67 @@ export default function CalendarPage() {
 
                       {/* Workout */}
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3 flex items-center gap-2">
                           <Target className="w-4 h-4" /> Workout
                         </h4>
                         {selectedWorkouts ? (
-                          <div className="bg-white/5 rounded-xl p-4">
+                          <div className="bg-foreground/5 rounded-xl p-4">
                             <div className="flex justify-between items-center mb-3">
                               <span className="text-sm font-medium text-green-400">Completed</span>
-                              <span className="text-xs text-gray-400">{selectedWorkouts.totalCaloriesBurned} kcal burned</span>
+                              <span className="text-xs text-text-secondary">{selectedWorkouts.totalCaloriesBurned} kcal burned</span>
                             </div>
                             <div className="space-y-2">
                               {selectedWorkouts.completedExercises.map((ex, i) => (
-                                <div key={i} className="flex justify-between text-sm items-center border-b border-white/5 pb-2 last:border-0 last:pb-0">
-                                  <span className="text-gray-300">{ex.exerciseName}</span>
-                                  <span className="text-gray-500 font-medium bg-white/5 px-2 py-0.5 rounded-md">{ex.setsCompleted} × {ex.repsCompleted}</span>
+                                <div key={i} className="flex justify-between text-sm items-center border-b border-border pb-2 last:border-0 last:pb-0">
+                                  <span className="text-text-secondary">{ex.exerciseName}</span>
+                                  <span className="text-text-secondary font-medium bg-foreground/5 px-2 py-0.5 rounded-md">{ex.setsCompleted} × {ex.repsCompleted}</span>
                                 </div>
                               ))}
                             </div>
                           </div>
                         ) : (
-                          <div className="bg-white/5 rounded-xl p-4 text-center">
-                            <p className="text-sm text-gray-500">No workout logged this day.</p>
+                          <div className="bg-foreground/5 rounded-xl p-4 text-center">
+                            <p className="text-sm text-text-secondary">No workout logged this day.</p>
                           </div>
                         )}
                       </div>
 
                       {/* Nutrition */}
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3 flex items-center gap-2">
                           <Utensils className="w-4 h-4" /> Meals
                         </h4>
                         {selectedNutrition.length > 0 ? (
                           <div className="space-y-2">
                             {selectedNutrition.map((meal, i) => (
-                              <div key={i} className="bg-white/5 rounded-xl p-3 flex justify-between items-center">
+                              <div key={i} className="bg-foreground/5 rounded-xl p-3 flex justify-between items-center">
                                 <div>
                                   <p className="text-sm font-medium">{meal.name}</p>
-                                  <p className="text-xs text-gray-500">{meal.protein}g P • {meal.carbs}g C • {meal.fat}g F</p>
+                                  <p className="text-xs text-text-secondary">{meal.protein}g P • {meal.carbs}g C • {meal.fat}g F</p>
                                 </div>
                                 <span className="text-sm font-bold text-accent">{meal.calories}</span>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <div className="bg-white/5 rounded-xl p-4 text-center">
-                            <p className="text-sm text-gray-500">No meals logged.</p>
+                          <div className="bg-foreground/5 rounded-xl p-4 text-center">
+                            <p className="text-sm text-text-secondary">No meals logged.</p>
                           </div>
                         )}
                       </div>
 
                       {/* Metrics */}
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide mb-3 flex items-center gap-2">
                           <Moon className="w-4 h-4" /> Daily Metrics
                         </h4>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="bg-white/5 rounded-xl p-3 text-center">
-                            <p className="text-xs text-gray-400 mb-1">Steps</p>
-                            <p className="text-lg font-bold text-white">{selectedMetrics?.steps || 0}</p>
+                          <div className="bg-foreground/5 rounded-xl p-3 text-center">
+                            <p className="text-xs text-text-secondary mb-1">Steps</p>
+                            <p className="text-lg font-bold text-foreground">{selectedMetrics?.steps || 0}</p>
                           </div>
-                          <div className="bg-white/5 rounded-xl p-3 text-center">
-                            <p className="text-xs text-gray-400 mb-1">Sleep</p>
+                          <div className="bg-foreground/5 rounded-xl p-3 text-center">
+                            <p className="text-xs text-text-secondary mb-1">Sleep</p>
                             <p className="text-lg font-bold text-indigo-400">{sleepHours > 0 ? `${sleepHours.toFixed(1)}h` : '--'}</p>
                           </div>
                         </div>

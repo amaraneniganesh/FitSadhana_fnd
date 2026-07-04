@@ -6,6 +6,7 @@ import api from '../lib/axios';
 import { useAuthStore } from '../store/useAuthStore';
 import { ArrowLeft, Plus, X, CheckCircle2, User2, Scale, Target, Dumbbell, Activity } from 'lucide-react';
 import { format } from 'date-fns';
+import Sidebar from '../components/Sidebar';
 
 const GOAL_OPTIONS = ['Weight Loss', 'Aesthetic Body', 'Fit Body', 'Muscle Gain', 'Athletic Performance', 'Own Plan'];
 
@@ -83,7 +84,7 @@ const ProfilePage = () => {
 
   const inputCls = "w-full input-field";
   const selectCls = "w-full select-field";
-  const labelCls = "block text-xs font-medium mb-1.5 text-gray-400 uppercase tracking-wide";
+  const labelCls = "block text-xs font-medium mb-1.5 text-text-secondary uppercase tracking-wide";
 
   const filteredEx = ALL_EXERCISES.filter(ex =>
     ex.name.toLowerCase().includes(exSearch.toLowerCase()) &&
@@ -91,22 +92,20 @@ const ProfilePage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 md:p-8 pb-20">
+    <div className="min-h-screen bg-background text-foreground flex transition-colors duration-300">
       <div className="fixed top-0 right-0 w-96 h-96 bg-violet-600/8 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-3xl mx-auto relative z-10">
-        {/* Header */}
-        <div className="flex flex-row items-center gap-4 mb-8 sticky top-4 z-50 bg-background/80 backdrop-blur-md p-2 rounded-2xl">
-          <Link to="/dashboard" className="flex-shrink-0">
-            <Button variant="ghost" className="w-10 h-10 p-0 rounded-xl bg-secondary hover:bg-secondary/80 flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </Button>
-          </Link>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl md:text-2xl font-bold truncate">Profile Settings</h1>
-            <p className="text-text-secondary text-xs md:text-sm truncate">Update your stats, plan, and exercises</p>
+      <Sidebar profile={profile} streak={0} />
+
+      <main className="ml-0 md:ml-60 flex-1 p-4 md:p-8 pb-20 md:pb-8 relative z-10 w-full overflow-hidden max-w-[100vw]">
+        <div className="max-w-3xl mx-auto">
+          {/* Header */}
+          <div className="flex flex-row items-center gap-4 mb-8 sticky top-0 z-50 bg-background/90 backdrop-blur-md p-2 -mx-2 rounded-2xl">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl md:text-2xl font-bold truncate">Profile Settings</h1>
+              <p className="text-text-secondary text-xs md:text-sm truncate">Update your stats, plan, and exercises</p>
+            </div>
           </div>
-        </div>
 
         {/* User info */}
         <div className="glass rounded-2xl p-5 flex items-center gap-4 mb-6">
@@ -188,7 +187,7 @@ const ProfilePage = () => {
                     className={`py-3 px-4 rounded-xl text-sm font-medium transition-all border ${
                       formData.fitnessGoal === g
                         ? 'bg-accent/15 border-accent text-accent'
-                        : 'bg-white/3 border-white/8 text-gray-400 hover:border-white/20'
+                        : 'bg-foreground/3 border-border text-text-secondary hover:border-border'
                     }`}
                   >{g}</button>
                 ))}
@@ -203,10 +202,10 @@ const ProfilePage = () => {
                     className={inputCls} value={exSearch}
                     onChange={e => setExSearch(e.target.value)} />
                   {exSearch && (
-                    <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-[#1a1a1a] border border-white/10 rounded-xl max-h-40 overflow-y-auto">
+                    <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-[#1a1a1a] border border-border rounded-xl max-h-40 overflow-y-auto">
                       {filteredEx.map(ex => (
                         <button key={ex.name} type="button" onClick={() => addExercise(ex)}
-                          className="w-full text-left px-4 py-2.5 hover:bg-white/5 text-sm flex justify-between">
+                          className="w-full text-left px-4 py-2.5 hover:bg-foreground/5 text-sm flex justify-between">
                           {ex.name} <Plus className="w-4 h-4 text-accent" />
                         </button>
                       ))}
@@ -215,12 +214,12 @@ const ProfilePage = () => {
                 </div>
                 <div className="space-y-2">
                   {customExercises.map(ex => (
-                    <div key={ex.name} className="flex items-center gap-2 bg-white/4 rounded-xl p-2.5">
+                    <div key={ex.name} className="flex items-center gap-2 bg-foreground/4 rounded-xl p-2.5">
                       <span className="flex-1 text-sm font-medium">{ex.name}</span>
-                      <input type="number" className="w-12 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-center text-xs" value={ex.sets}
+                      <input type="number" className="w-12 bg-foreground/5 border border-border rounded-lg px-2 py-1 text-center text-xs" value={ex.sets}
                         onChange={e => setCustomExercises(prev => prev.map(e2 => e2.name === ex.name ? { ...e2, sets: Number(e.target.value) } : e2))} />
-                      <span className="text-xs text-gray-500">×</span>
-                      <input type="number" className="w-12 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-center text-xs" value={ex.reps}
+                      <span className="text-xs text-text-secondary">×</span>
+                      <input type="number" className="w-12 bg-foreground/5 border border-border rounded-lg px-2 py-1 text-center text-xs" value={ex.reps}
                         onChange={e => setCustomExercises(prev => prev.map(e2 => e2.name === ex.name ? { ...e2, reps: Number(e.target.value) } : e2))} />
                       <button type="button" onClick={() => removeExercise(ex.name)}>
                         <X className="w-4 h-4 text-red-400" />
@@ -228,7 +227,7 @@ const ProfilePage = () => {
                     </div>
                   ))}
                   {customExercises.length === 0 && (
-                    <p className="text-center text-gray-600 text-sm py-4">No exercises added</p>
+                    <p className="text-center text-text-secondary text-sm py-4">No exercises added</p>
                   )}
                 </div>
               </div>
@@ -238,16 +237,16 @@ const ProfilePage = () => {
 
         {activeTab === 'history' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass rounded-2xl p-6">
-            <h3 className="text-sm font-semibold text-gray-400 mb-4 uppercase tracking-wide">Weight History</h3>
+            <h3 className="text-sm font-semibold text-text-secondary mb-4 uppercase tracking-wide">Weight History</h3>
             {profile?.weightHistory?.length > 0 ? (
               <div className="space-y-3">
                 {[...profile.weightHistory].reverse().map((entry, i) => {
                   const isFirst = i === profile.weightHistory.length - 1;
                   return (
-                    <div key={i} className="flex items-center justify-between p-3 bg-white/3 rounded-xl">
+                    <div key={i} className="flex items-center justify-between p-3 bg-foreground/3 rounded-xl">
                       <div>
                         <p className="text-sm font-medium">{entry.weight} kg</p>
-                        <p className="text-xs text-gray-500">{format(new Date(entry.date), 'MMM d, yyyy · h:mm a')}</p>
+                        <p className="text-xs text-text-secondary">{format(new Date(entry.date), 'MMM d, yyyy · h:mm a')}</p>
                       </div>
                       {entry.note && (
                         <span className={`text-xs font-medium px-2 py-1 rounded-lg ${
@@ -261,7 +260,7 @@ const ProfilePage = () => {
                 })}
               </div>
             ) : (
-              <p className="text-gray-600 text-sm text-center py-8">No weight history yet</p>
+              <p className="text-text-secondary text-sm text-center py-8">No weight history yet</p>
             )}
           </motion.div>
         )}
@@ -280,7 +279,8 @@ const ProfilePage = () => {
             </Button>
           </div>
         )}
-      </div>
+        </div>
+      </main>
     </div>
   );
 };

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import api from '../lib/axios';
 import { EXERCISE_DB, TARGET_COLORS } from '../data/exercises';
+import Sidebar from '../components/Sidebar';
 
 export default function Workout() {
   const navigate = useNavigate();
@@ -122,47 +123,42 @@ export default function Workout() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground flex transition-colors duration-300">
       <div className="fixed top-0 right-0 w-80 h-80 bg-accent/8 rounded-full blur-[120px] pointer-events-none z-0" />
       <div className="fixed bottom-0 left-0 w-72 h-72 bg-violet-600/6 rounded-full blur-[100px] pointer-events-none z-0" />
 
-      {/* ─── HEADER ─── */}
-      <div className="sticky top-0 z-20 bg-background/90 backdrop-blur-xl border-b border-border">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="flex-shrink-0 w-9 h-9 rounded-xl bg-secondary border border-border flex items-center justify-center hover:bg-secondary transition-all active:scale-95"
-          >
-            <ArrowLeft className="w-4 h-4 text-text-secondary" />
-          </button>
+      <Sidebar profile={profile} streak={0} />
 
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold truncate">Today's Workout</h1>
-            {profile && (
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-xs text-text-secondary">Goal:</span>
-                <span className="text-xs font-semibold text-accent">{profile.fitnessGoal}</span>
-              </div>
-            )}
+      <main className="ml-0 md:ml-60 flex-1 relative z-10 w-full overflow-y-auto overflow-x-hidden max-w-[100vw] pb-20 md:pb-0">
+        {/* ─── HEADER ─── */}
+        <div className="sticky top-0 z-20 bg-background/90 backdrop-blur-xl border-b border-border">
+          <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg font-bold truncate">Today's Workout</h1>
+              {profile && (
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-xs text-text-secondary">Goal:</span>
+                  <span className="text-xs font-semibold text-accent">{profile.fitnessGoal}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="text-right">
+              <p className="text-sm font-bold text-accent">{totalCals} kcal</p>
+              <p className="text-[10px] text-text-secondary uppercase">Est. Burn</p>
+            </div>
           </div>
-
-          <div className="flex-shrink-0 flex items-center gap-2 bg-orange-500/12 border border-orange-500/25 px-3 py-1.5 rounded-xl">
-            <Flame className="w-4 h-4 text-orange-400" />
-            <span className="text-sm font-bold text-orange-300">{totalCals}</span>
-            <span className="text-xs text-orange-500 hidden sm:block">kcal</span>
-          </div>
+          
+          {exercises.length > 0 && (
+            <div className="w-full h-0.5 bg-secondary">
+              <motion.div
+                className="h-full bg-accent"
+                animate={{ width: `${progress}%` }}
+                transition={{ type: 'spring', damping: 20 }}
+              />
+            </div>
+          )}
         </div>
-
-        {exercises.length > 0 && (
-          <div className="w-full h-0.5 bg-secondary">
-            <motion.div
-              className="h-full bg-accent"
-              animate={{ width: `${progress}%` }}
-              transition={{ type: 'spring', damping: 20 }}
-            />
-          </div>
-        )}
-      </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 relative z-10 space-y-5">
         
@@ -171,7 +167,7 @@ export default function Workout() {
           <button
             onClick={generateAiPlan}
             disabled={aiLoading}
-            className="w-full flex items-center gap-3 p-4 hover:bg-white/3 transition-all text-left"
+            className="w-full flex items-center gap-3 p-4 hover:bg-foreground/3 transition-all text-left"
           >
             <div className="w-8 h-8 rounded-xl bg-accent flex items-center justify-center flex-shrink-0">
               <Sparkles className="w-4 h-4 text-foreground" />
@@ -261,7 +257,7 @@ export default function Workout() {
                     className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
                       isDone
                         ? 'bg-green-500/6 border-green-500/30'
-                        : 'bg-white/3 border-border hover:border-border'
+                        : 'bg-foreground/3 border-border hover:border-border'
                     }`}
                   >
                     <div className="p-4">
@@ -311,7 +307,7 @@ export default function Workout() {
                         </div>
 
                         <button onClick={() => removeExercise(ex.id)}
-                          className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-gray-700 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                          className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-text-secondary hover:text-red-400 hover:bg-red-500/10 transition-all">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -323,7 +319,7 @@ export default function Workout() {
 
             {exercises.length === 0 && (
               <div className="text-center py-12">
-                <Dumbbell className="w-10 h-10 text-gray-700 mx-auto mb-3" />
+                <Dumbbell className="w-10 h-10 text-text-secondary mx-auto mb-3" />
                 <p className="text-text-secondary text-sm">No exercises yet. Click Generate AI Plan or Add Manual.</p>
               </div>
             )}
@@ -370,7 +366,8 @@ export default function Workout() {
             </div>
           </motion.div>
         )}
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

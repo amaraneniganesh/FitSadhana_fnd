@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /register
+Disallow: /dashboard
+Disallow: /workout
+Disallow: /calendar
+Disallow: /profile
+Disallow: /scanner
+Disallow: /onboarding
+
+Sitemap: https://fitsadhana.dhanvatix.in/sitemap.xml

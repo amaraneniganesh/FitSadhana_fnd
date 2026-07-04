@@ -4,6 +4,7 @@ import { X, Camera, Keyboard, ScanLine, Loader2, ArrowLeft } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/axios';
+import Sidebar from '../components/Sidebar';
 
 const Scanner = () => {
   const navigate = useNavigate();
@@ -172,13 +173,15 @@ const Scanner = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      {/* Navbar */}
-      <div className="px-5 py-4 border-b border-border flex items-center justify-between sticky top-0 bg-background/90 backdrop-blur-lg z-30">
-        <button onClick={handleBack} className="p-2 -ml-2 rounded-xl bg-secondary text-text-secondary hover:text-foreground transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div className="flex items-center gap-2">
+    <div className="min-h-screen bg-background text-foreground flex transition-colors duration-300">
+      <div className="fixed top-0 right-0 w-80 h-80 bg-accent/10 rounded-full blur-[150px] pointer-events-none z-0" />
+      
+      <Sidebar profile={null} streak={0} />
+
+      <main className="ml-0 md:ml-60 flex-1 flex flex-col relative z-10 w-full max-w-[100vw] pb-20 md:pb-0" aria-label="Product Scanner">
+        {/* Navbar */}
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between sticky top-0 bg-background/90 backdrop-blur-lg z-30">
+          <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-lg shadow-accent/20">
             <ScanLine className="w-4 h-4 text-foreground" />
           </div>
@@ -191,7 +194,7 @@ const Scanner = () => {
         <div className="max-w-md mx-auto p-5 space-y-6">
           
           {/* Camera View */}
-          <div className="relative bg-[#111] w-full rounded-3xl overflow-hidden border border-border shadow-[0_0_40px_rgba(59,130,246,0.05)]" style={{ minHeight: '340px' }}>
+          <div className="relative bg-foreground/5 w-full rounded-3xl overflow-hidden border border-border shadow-[0_0_40px_rgba(59,130,246,0.05)]" style={{ minHeight: '340px' }}>
             {cameraError ? (
               <div className="text-center p-6 flex flex-col items-center justify-center h-[340px]">
                 <div className="w-14 h-14 bg-red-500/15 text-red-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -213,7 +216,7 @@ const Scanner = () => {
                     border: none !important;
                   }
                 `}</style>
-                <div id={qrcodeRegionId} className="w-full h-full absolute inset-0" />
+                <div id={qrcodeRegionId} className="w-full h-full absolute inset-0" aria-label="Camera scanner view" />
                 
                 {/* Scan overlay with corner markers */}
                 <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center z-10">
@@ -233,14 +236,14 @@ const Scanner = () => {
                   </div>
                   
                   {isStarting ? (
-                    <div className="mt-8 flex items-center gap-2 bg-black/80 px-5 py-2.5 rounded-full border border-border backdrop-blur-md">
+                    <div className="mt-8 flex items-center gap-2 bg-background/80 px-5 py-2.5 rounded-full border border-border backdrop-blur-md">
                       <Loader2 className="w-4 h-4 animate-spin text-accent" />
                       <span className="text-xs text-foreground/90 font-medium tracking-wide">Initializing Camera...</span>
                     </div>
                   ) : (
-                    <p className="mt-8 text-xs text-foreground/90 bg-black/80 px-5 py-2.5 rounded-full font-medium tracking-wide border border-border backdrop-blur-md">
+                    <div className="mt-8 bg-background px-5 py-2.5 rounded-full text-sm font-bold shadow-xl border border-border text-foreground backdrop-blur-md">
                       Point camera at any barcode
-                    </p>
+                    </div>
                   )}
                 </div>
               </>
@@ -255,7 +258,7 @@ const Scanner = () => {
           </div>
 
           {/* Manual Entry */}
-          <div className="bg-[#111] p-5 rounded-3xl border border-border shadow-xl space-y-4">
+          <div className="bg-foreground/5 p-5 rounded-3xl border border-border shadow-xl space-y-4">
             <div>
               <h3 className="font-bold text-foreground mb-1">Enter Barcode Manually</h3>
               <p className="text-xs text-text-secondary">Type or paste the number underneath the barcode.</p>
@@ -269,10 +272,11 @@ const Scanner = () => {
                 <input
                   type="text"
                   value={manualCode}
+                  aria-label="Enter barcode"
                   onChange={e => setManualCode(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleManualSubmit()}
                   placeholder="e.g. 8901030794483"
-                  className="w-full bg-[#1a1a2e] border border-border rounded-2xl pl-12 pr-4 py-4 text-base font-mono text-foreground focus:outline-none focus:border-accent focus:ring-2 focus:-accent/20 transition-all placeholder:font-sans placeholder:text-text-secondary"
+                  className="w-full bg-background border border-border rounded-2xl pl-12 pr-4 py-4 text-base font-mono text-foreground focus:outline-none focus:border-accent focus:ring-2 focus:-accent/20 transition-all placeholder:font-sans placeholder:text-text-secondary"
                 />
               </div>
               
@@ -316,7 +320,7 @@ const Scanner = () => {
       {/* Unknown Barcode Fallback Modal */}
       <AnimatePresence>
         {unknownBarcode && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-background/85 backdrop-blur-md">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -338,6 +342,7 @@ const Scanner = () => {
                 <input 
                   autoFocus
                   type="text" 
+                  aria-label="Product name"
                   placeholder="e.g. Sangam Sweets Dharwad Peda"
                   value={unknownProductHint}
                   onChange={(e) => setUnknownProductHint(e.target.value)}
@@ -367,7 +372,7 @@ const Scanner = () => {
           </div>
         )}
       </AnimatePresence>
-
+      </main>
     </div>
   );
 };

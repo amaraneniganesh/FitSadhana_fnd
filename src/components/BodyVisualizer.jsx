@@ -163,7 +163,7 @@ const BodyVisualizer = ({ height = 170, weight = 70, goal = 'Fit Body', gender =
             { label: 'Weight', value: `${weight} kg` },
             { label: 'Ideal range', value: `${idealMin}–${idealMax}` },
           ].map(({ label, value }) => (
-            <div key={label} className="bg-white/3 rounded-xl p-2 text-center">
+            <div key={label} className="bg-foreground/3 rounded-xl p-2 text-center">
               <p className="text-xs text-text-secondary mb-0.5">{label}</p>
               <p className="text-xs font-semibold text-text-secondary">{value}</p>
             </div>

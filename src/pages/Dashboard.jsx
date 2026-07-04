@@ -213,7 +213,7 @@ const Dashboard = () => {
       <Sidebar profile={profile} streak={streak} onScanClick={() => setTriggerScan(p => p + 1)} />
 
       {/* Main */}
-      <main className="ml-16 md:ml-60 flex-1 p-4 md:p-8 relative z-10 w-full overflow-hidden max-w-[100vw]">
+      <main className="ml-0 md:ml-60 flex-1 p-4 md:p-8 relative z-10 w-full overflow-hidden max-w-[100vw]">
 
         {/* Topbar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-7 gap-4">
@@ -320,7 +320,7 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <div className="text-center py-4">
-                  <Dumbbell className="w-8 h-8 text-gray-700 mx-auto mb-2" />
+                  <Dumbbell className="w-8 h-8 text-text-secondary mx-auto mb-2" />
                   <p className="text-sm text-text-secondary">No workouts yet</p>
                   <Link to="/workout" className="text-xs text-accent mt-1 block">Start now →</Link>
                 </div>

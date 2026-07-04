@@ -36,11 +36,11 @@ const WorkoutCalendar = () => {
     <div className="flex justify-between items-center mb-4">
       <h3 className="text-base font-bold text-gray-200">{format(currentMonth, 'MMMM yyyy')}</h3>
       <div className="flex gap-1">
-        <button onClick={prevMonth} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-          <ChevronLeft className="w-4 h-4 text-gray-400" />
+        <button onClick={prevMonth} className="w-8 h-8 rounded-lg bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors">
+          <ChevronLeft className="w-4 h-4 text-text-secondary" />
         </button>
-        <button onClick={nextMonth} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-          <ChevronRight className="w-4 h-4 text-gray-400" />
+        <button onClick={nextMonth} className="w-8 h-8 rounded-lg bg-foreground/5 hover:bg-foreground/10 flex items-center justify-center transition-colors">
+          <ChevronRight className="w-4 h-4 text-text-secondary" />
         </button>
       </div>
     </div>
@@ -51,7 +51,7 @@ const WorkoutCalendar = () => {
     const startDate = startOfWeek(currentMonth);
     for (let i = 0; i < 7; i++) {
       days.push(
-        <div className="text-center font-medium text-gray-500 text-[11px] uppercase tracking-wider py-1" key={i}>
+        <div className="text-center font-medium text-text-secondary text-[11px] uppercase tracking-wider py-1" key={i}>
           {format(addDays(startDate, i), 'EEE')}
         </div>
       );
@@ -88,11 +88,11 @@ const WorkoutCalendar = () => {
         days.push(
           <div
             className={`flex items-center justify-center h-10 w-full rounded-xl cursor-pointer transition-all border text-sm relative group ${
-              !isCurrentMonth ? 'text-gray-600 border-transparent opacity-40 hover:bg-white/5 hover:opacity-100' : 
+              !isCurrentMonth ? 'text-text-secondary border-transparent opacity-40 hover:bg-foreground/5 hover:opacity-100' : 
               hasWorkout ? 'bg-green-500/10 border-green-500/20 text-green-400 hover:border-green-500/50 hover:bg-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]' :
               isMissed ? 'bg-red-500/5 border-red-500/10 text-red-300 hover:border-red-500/30' :
               isDayToday ? 'bg-accent/15 border-accent/30 text-accent font-bold' :
-              'bg-white/3 border-transparent hover:border-white/10 text-gray-300 hover:bg-white/5'
+              'bg-foreground/3 border-transparent hover:border-border text-text-secondary hover:bg-foreground/5'
             }`}
             key={day.toString()}
             onClick={() => handleDayClick(cloneDay)}

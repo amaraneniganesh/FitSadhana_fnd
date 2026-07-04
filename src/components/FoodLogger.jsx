@@ -110,16 +110,18 @@ const FoodLogger = ({ tdee, onLog, triggerScan }) => {
         <div className="flex gap-2">
           <button 
             onClick={() => navigate('/scanner')}
-            className="text-xs bg-secondary text-text-secondary hover:bg-secondary px-2 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+            className="text-sm bg-secondary text-text-secondary hover:bg-secondary px-3 py-2.5 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center gap-1 transition-colors"
             title="Scan Barcode"
+            aria-label="Scan Barcode"
           >
-            <ScanLine className="w-4 h-4" />
+            <ScanLine className="w-5 h-5" />
           </button>
           <button 
             onClick={() => setIsOpen(true)}
-            className="text-xs bg-accent/10 text-accent hover:bg-accent/20 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+            className="text-sm font-medium bg-accent/10 text-accent hover:bg-accent/20 px-4 py-2.5 min-h-[44px] rounded-xl flex items-center gap-2 transition-colors"
+            aria-label="Add Food"
           >
-            <Plus className="w-3.5 h-3.5" /> Add
+            <Plus className="w-4 h-4" /> Add
           </button>
         </div>
       </div>
@@ -137,7 +139,7 @@ const FoodLogger = ({ tdee, onLog, triggerScan }) => {
 
       {loading && !isOpen && (
          <div className="mt-4 flex items-center justify-center gap-2 text-xs text-text-secondary">
-           <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+           <div className="w-3 h-3 border-2 border-border border-t-white rounded-full animate-spin" />
            Looking up product...
          </div>
       )}
@@ -198,7 +200,7 @@ const FoodLogger = ({ tdee, onLog, triggerScan }) => {
               className="w-full py-3 bg-accent rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:opacity-90 mt-auto"
             >
               {loading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-border border-t-white rounded-full animate-spin" />
               ) : (
                 <><Sparkles className="w-4 h-4" /> Analyze & Log Food</>
               )}

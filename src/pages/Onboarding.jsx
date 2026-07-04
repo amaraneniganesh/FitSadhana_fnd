@@ -158,10 +158,10 @@ const Onboarding = () => {
 
   const inputCls = "w-full input-field";
   const selectCls = "w-full select-field";
-  const labelCls = "block text-sm font-medium mb-2 text-gray-400";
+  const labelCls = "block text-sm font-medium mb-2 text-text-secondary";
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#0A0A0A]">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/8 rounded-full blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600/8 rounded-full blur-[120px]" />
@@ -170,8 +170,8 @@ const Onboarding = () => {
       <div className="w-full max-w-2xl z-10 relative">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="text-2xl font-bold tracking-tight mb-1">Fitness<span className="-accent">AI</span></div>
-          <p className="text-gray-500 text-sm">Step {currentStep + 1} of {steps.length}</p>
+          <div className="text-2xl font-bold tracking-tight mb-1 text-foreground">FitSadhana</div>
+          <p className="text-text-secondary text-sm">Step {currentStep + 1} of {steps.length}</p>
         </div>
 
         <div className="glass-strong rounded-3xl p-8 md:p-10">
@@ -179,15 +179,15 @@ const Onboarding = () => {
           <div className="flex gap-2 mb-8">
             {steps.map((step, idx) => (
               <div key={step.id} className="flex-1 flex flex-col gap-1.5">
-                <div className={`h-1 rounded-full transition-all duration-500 ${idx <= currentStep ? 'bg-gradient-to-r from-accent to-accent' : 'bg-white/8'}`} />
-                <span className={`text-xs text-center transition-colors ${idx === currentStep ? 'text-accent' : 'text-gray-600'}`}>{step.title}</span>
+                <div className={`h-1 rounded-full transition-all duration-500 ${idx <= currentStep ? 'bg-gradient-to-r from-accent to-accent' : 'bg-foreground/8'}`} />
+                <span className={`text-xs text-center transition-colors ${idx === currentStep ? 'text-accent' : 'text-text-secondary'}`}>{step.title}</span>
               </div>
             ))}
           </div>
 
           <div className="mb-8">
             <h2 className="text-2xl font-bold mb-1">{steps[currentStep].title}</h2>
-            <p className="text-gray-500 text-sm">{steps[currentStep].subtitle}</p>
+            <p className="text-text-secondary text-sm">{steps[currentStep].subtitle}</p>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -244,7 +244,7 @@ const Onboarding = () => {
                             className={`py-3 px-4 rounded-xl text-sm font-medium transition-all border ${
                               formData.fitnessGoal === g
                                 ? 'bg-accent/15 border-accent text-accent'
-                                : 'bg-white/3 border-white/8 text-gray-400 hover:border-white/20'
+                                : 'bg-foreground/3 border-border text-text-secondary hover:border-border'
                             }`}
                           >
                             {g}
@@ -271,31 +271,31 @@ const Onboarding = () => {
                             onChange={(e) => setExerciseSearch(e.target.value)}
                           />
                           {exerciseSearch && (
-                            <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-[#1a1a1a] border border-white/10 rounded-xl max-h-40 overflow-y-auto">
+                            <div className="absolute top-full left-0 right-0 z-20 mt-1 bg-[#1a1a1a] border border-border rounded-xl max-h-40 overflow-y-auto">
                               {filteredExercises.map(ex => (
                                 <button key={ex.name} type="button" onClick={() => addCustomExercise(ex)}
-                                  className="w-full text-left px-4 py-2.5 hover:bg-white/5 text-sm flex justify-between">
+                                  className="w-full text-left px-4 py-2.5 hover:bg-foreground/5 text-sm flex justify-between">
                                   {ex.name} <Plus className="w-4 h-4 -accent" />
                                 </button>
                               ))}
-                              {filteredExercises.length === 0 && <div className="px-4 py-3 text-gray-500 text-sm">No results</div>}
+                              {filteredExercises.length === 0 && <div className="px-4 py-3 text-text-secondary text-sm">No results</div>}
                             </div>
                           )}
                         </div>
                         <div className="space-y-2 max-h-48 overflow-y-auto">
                           {formData.customExercises.map(ex => (
-                            <div key={ex.name} className="flex items-center gap-2 bg-white/4 rounded-xl p-2">
+                            <div key={ex.name} className="flex items-center gap-2 bg-foreground/4 rounded-xl p-2">
                               <span className="flex-1 text-sm font-medium">{ex.name}</span>
-                              <input type="number" className="w-14 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-center text-xs" value={ex.sets} onChange={(e) => updateCustomExercise(ex.name, 'sets', e.target.value)} />
-                              <span className="text-gray-500 text-xs">sets</span>
-                              <input type="number" className="w-14 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-center text-xs" value={ex.reps} onChange={(e) => updateCustomExercise(ex.name, 'reps', e.target.value)} />
-                              <span className="text-gray-500 text-xs">reps</span>
+                              <input type="number" className="w-14 bg-foreground/5 border border-border rounded-lg px-2 py-1 text-center text-xs" value={ex.sets} onChange={(e) => updateCustomExercise(ex.name, 'sets', e.target.value)} />
+                              <span className="text-text-secondary text-xs">sets</span>
+                              <input type="number" className="w-14 bg-foreground/5 border border-border rounded-lg px-2 py-1 text-center text-xs" value={ex.reps} onChange={(e) => updateCustomExercise(ex.name, 'reps', e.target.value)} />
+                              <span className="text-text-secondary text-xs">reps</span>
                               <button type="button" onClick={() => removeCustomExercise(ex.name)}>
                                 <X className="w-4 h-4 text-red-400 hover:text-red-300" />
                               </button>
                             </div>
                           ))}
-                          {formData.customExercises.length === 0 && <p className="text-gray-600 text-sm text-center py-4">No exercises added yet</p>}
+                          {formData.customExercises.length === 0 && <p className="text-text-secondary text-sm text-center py-4">No exercises added yet</p>}
                         </div>
                       </div>
                     )}
@@ -328,7 +328,7 @@ const Onboarding = () => {
                             className={`w-12 h-12 rounded-xl text-sm font-semibold transition-all border ${
                               formData.workoutDays === d
                                 ? 'bg-accent/20 border-accent text-accent'
-                                : 'bg-white/3 border-white/8 text-gray-400 hover:border-white/20'
+                                : 'bg-foreground/3 border-border text-text-secondary hover:border-border'
                             }`}
                           >{d}</button>
                         ))}
@@ -343,7 +343,7 @@ const Onboarding = () => {
                     <div
                       onClick={() => setFormData({ ...formData, gymAccess: !formData.gymAccess })}
                       className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${
-                        formData.gymAccess ? 'bg-accent/10 border-accent/40' : 'bg-white/3 border-white/8'
+                        formData.gymAccess ? 'bg-accent/10 border-accent/40' : 'bg-foreground/3 border-border'
                       }`}
                     >
                       <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${
@@ -353,7 +353,7 @@ const Onboarding = () => {
                       </div>
                       <div>
                         <p className="text-sm font-medium">Gym Access</p>
-                        <p className="text-xs text-gray-500">I have access to a fully equipped gym</p>
+                        <p className="text-xs text-text-secondary">I have access to a fully equipped gym</p>
                       </div>
                     </div>
                   </div>
@@ -361,7 +361,7 @@ const Onboarding = () => {
               </motion.div>
             </AnimatePresence>
 
-            <div className="flex justify-between mt-8 pt-6 border-t border-white/6">
+            <div className="flex justify-between mt-8 pt-6 border-t border-border">
               {currentStep > 0 ? (
                 <Button type="button" variant="ghost" onClick={handlePrev} className="px-5">
                   <ChevronLeft className="w-4 h-4 mr-1" /> Back
