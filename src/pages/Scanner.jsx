@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { X, Camera, Keyboard, ScanLine, Loader2, ArrowLeft } from 'lucide-react';
+import { X, Camera, Keyboard, ScanLine, Loader2, ArrowLeft, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/axios';
@@ -23,6 +23,7 @@ const Scanner = () => {
   // Unknown Barcode Fallback State
   const [unknownBarcode, setUnknownBarcode] = useState(null);
   const [unknownProductHint, setUnknownProductHint] = useState('');
+  const [conflictProducts, setConflictProducts] = useState(null);
 
   const stopScanner = useCallback(async () => {
     if (scannerRef.current) {
@@ -74,11 +75,31 @@ const Scanner = () => {
 
   const saveLog = async (foodData) => {
     try {
-      await api.post('/nutrition/log', { food: foodData });
+      await api.post('/nutrition', foodData);
       return true;
     } catch (err) {
       console.error(err);
       return false;
+    }
+  };
+
+  const analyzeAndSave = async (foodQuery) => {
+    setLoading(true);
+    setError('');
+    try {
+      const analyzeRes = await api.post('/nutrition/analyze', { 
+        food: `Product: "${foodQuery}". Provide accurate estimated nutrition per 100g serving.` 
+      });
+      const success = await saveLog(analyzeRes.data);
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        setError('Failed to save product.');
+      }
+    } catch (err) {
+      setError(`Failed to find nutrition for ${foodQuery}.`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,83 +109,143 @@ const Scanner = () => {
     setError('');
     
     try {
-      // 1. Try Indian OFF, then Global OFF
-      let product = null;
-      const endpoints = [
+      let offProductData = null;
+      let offProductNameOnly = null;
+      let upcProductName = null;
+
+      // 1. Fetch from Open Food Facts
+      const offEndpoints = [
         `https://in.openfoodfacts.org/api/v0/product/${barcode}.json`,
         `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
       ];
 
-      for (const url of endpoints) {
+      for (const url of offEndpoints) {
         try {
           const res = await fetch(url);
           const data = await res.json();
           if (data.status === 1 && data.product) {
-            product = data.product;
-            break;
+            const p = data.product;
+            const n = p.nutriments || {};
+            const cal = Math.round(n['energy-kcal_100g'] || n['energy-kcal'] || (n['energy_100g'] ? n['energy_100g'] / 4.184 : 0));
+            const pro = Math.round(n['proteins_100g'] || n['proteins'] || 0);
+            
+            const pName = p.product_name || p.product_name_en || p.brands || 'Unknown Product';
+            const fullName = `${pName} (${p.quantity || '100g'})`;
+
+            if (cal > 0 || pro > 0) {
+              offProductData = {
+                source: 'openfoodfacts',
+                name: fullName,
+                calories: cal,
+                protein: pro,
+                carbs: Math.round(n['carbohydrates_100g'] || n['carbohydrates'] || 0),
+                fat: Math.round(n['fat_100g'] || n['fat'] || 0)
+              };
+              break;
+            } else if (pName !== 'Unknown Product' && !offProductNameOnly) {
+              offProductNameOnly = fullName;
+            }
           }
         } catch (_) { }
       }
-      
-      if (product) {
-        const n = product.nutriments || {};
+
+      // 2. Fetch from UPCItemDB (Via backend proxy to avoid CORS)
+      try {
+        const upcRes = await api.get(`/nutrition/upc/${barcode}`);
+        const upcData = upcRes.data;
+        if (upcData.code === 'OK' && upcData.items && upcData.items.length > 0) {
+          upcProductName = upcData.items[0].title;
+        }
+      } catch (err) { 
+        console.error("UPC fetch failed:", err);
+      }
+
+      // 3. Aggregate Results
+      const results = [];
+      if (offProductData) {
+        results.push(offProductData);
+      } else if (offProductNameOnly) {
+        results.push({
+          source: 'openfoodfacts_name_only',
+          name: offProductNameOnly,
+          barcode: barcode
+        });
+      }
+
+      if (upcProductName) {
+        let isSimilar = false;
+        const compareName = offProductData ? offProductData.name : (offProductNameOnly || '');
+        if (compareName) {
+          const offLower = compareName.toLowerCase();
+          const upcLower = upcProductName.toLowerCase();
+          const commonWords = offLower.split(' ').filter(w => w.length > 3 && upcLower.includes(w));
+          if (commonWords.length > 0) isSimilar = true;
+        }
         
-        const foodData = {
-          name: `${product.product_name || product.product_name_en || 'Unknown Product'} (${product.quantity || '100g'})`,
-          calories: Math.round(n['energy-kcal_100g'] || n['energy-kcal'] || (n['energy_100g'] ? n['energy_100g'] / 4.184 : 0)),
-          protein: Math.round(n['proteins_100g'] || n['proteins'] || 0),
-          carbs: Math.round(n['carbohydrates_100g'] || n['carbohydrates'] || 0),
-          fat: Math.round(n['fat_100g'] || n['fat'] || 0)
-        };
-
-        if (foodData.calories === 0 && foodData.protein === 0) {
-          setUnknownBarcode(barcode);
-          return;
+        if (!isSimilar) {
+          results.push({
+            source: 'upcitemdb',
+            name: upcProductName,
+            barcode: barcode
+          });
         }
+      }
 
-        const success = await saveLog(foodData);
-        if (success) {
-          navigate('/dashboard');
+      setLoading(false);
+
+      if (results.length === 1) {
+        if (results[0].source === 'openfoodfacts') {
+          const success = await saveLog(results[0]);
+          if (success) navigate('/dashboard');
+          else setError('Failed to save scanned product.');
         } else {
-          setError('Failed to save scanned product.');
+          // UPCItemDB result - needs AI analysis
+          await analyzeAndSave(`${results[0].name} (Barcode ${barcode})`);
         }
+      } else if (results.length > 1) {
+        // Show Conflict Resolution Modal
+        setConflictProducts(results);
       } else {
-        // 2. Not found in databases — Ask user for product name
+        // Not found anywhere
         setUnknownBarcode(barcode);
       }
     } catch (err) {
-      setError('Error looking up barcode. Try again.');
-    } finally {
       setLoading(false);
+      setError('Error looking up barcode. Try again.');
     }
   };
 
-  const handleManualSubmit = () => {
+  const handleManualSubmit = async () => {
     const code = manualCode.trim();
     if (!code) return;
-    handleScan(code);
+    
+    // If the input contains letters, it's a product name (e.g., "Kurkure", "10 rs coke")
+    // Send it directly to our AI analysis endpoint instead of treating it as a barcode!
+    if (/[a-zA-Z]/.test(code) || code.length < 5) {
+      await analyzeAndSave(code);
+    } else {
+      // It's a numerical barcode
+      handleScan(code);
+    }
   };
 
   const handleUnknownBarcodeSubmit = async () => {
     if (!unknownProductHint.trim()) return;
-    setLoading(true);
-    setError('');
-    
-    try {
-      const analyzeRes = await api.post('/nutrition/analyze', { 
-        food: `Packaged Indian product with barcode ${unknownBarcode}. The user states the product is named "${unknownProductHint}". Provide accurate estimated nutrition per 100g serving for this specific product.` 
-      });
-      const success = await saveLog(analyzeRes.data);
+    await analyzeAndSave(`${unknownProductHint} (Barcode ${unknownBarcode})`);
+    setUnknownBarcode(null);
+  };
+
+  const handleConflictSelect = async (selectedProduct) => {
+    setConflictProducts(null);
+    if (selectedProduct.source === 'openfoodfacts') {
+      const success = await saveLog(selectedProduct);
       if (success) {
-        setUnknownBarcode(null);
         navigate('/dashboard');
       } else {
         setError('Failed to save product.');
       }
-    } catch (err) {
-      setError(`Failed to estimate nutrition for ${unknownProductHint}.`);
-    } finally {
-      setLoading(false);
+    } else {
+      await analyzeAndSave(`${selectedProduct.name} (Barcode ${selectedProduct.barcode})`);
     }
   };
 
@@ -260,8 +341,8 @@ const Scanner = () => {
           {/* Manual Entry */}
           <div className="bg-foreground/5 p-5 rounded-3xl border border-border shadow-xl space-y-4">
             <div>
-              <h3 className="font-bold text-foreground mb-1">Enter Barcode Manually</h3>
-              <p className="text-xs text-text-secondary">Type or paste the number underneath the barcode.</p>
+              <h3 className="font-bold text-foreground mb-1">Search or Enter Barcode</h3>
+              <p className="text-xs text-text-secondary">Type a product name (e.g. Kurkure, 10 Rs Coke) or its barcode.</p>
             </div>
             
             <div className="space-y-3">
@@ -272,10 +353,10 @@ const Scanner = () => {
                 <input
                   type="text"
                   value={manualCode}
-                  aria-label="Enter barcode"
+                  aria-label="Search food or barcode"
                   onChange={e => setManualCode(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleManualSubmit()}
-                  placeholder="e.g. 8901030794483"
+                  placeholder="e.g. Kurkure or 8901030794483"
                   className="w-full bg-background border border-border rounded-2xl pl-12 pr-4 py-4 text-base font-mono text-foreground focus:outline-none focus:border-accent focus:ring-2 focus:-accent/20 transition-all placeholder:font-sans placeholder:text-text-secondary"
                 />
               </div>
@@ -285,7 +366,7 @@ const Scanner = () => {
                 disabled={!manualCode.trim() || loading}
                 className="w-full py-4 bg-accent rounded-2xl text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all hover:opacity-90 active:scale-[0.98] shadow-lg shadow-accent/20 text-foreground"
               >
-                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><ScanLine className="w-5 h-5" /> Lookup Product</>}
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Search className="w-5 h-5" /> Lookup Product</>}
               </button>
             </div>
             
@@ -314,6 +395,55 @@ const Scanner = () => {
               Querying global databases and AI models to find nutritional information...
             </p>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Conflict Resolution Modal */}
+      <AnimatePresence>
+        {conflictProducts && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-background/85 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-full max-w-md bg-foreground/5 border border-border rounded-3xl p-6 shadow-2xl relative"
+            >
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-accent/10 border border-accent rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-accent" />
+                </div>
+                <h3 className="font-bold text-xl text-foreground">Multiple Products Found</h3>
+                <p className="text-sm text-text-secondary mt-2 leading-relaxed">
+                  Different databases returned different results for this barcode. Please select the correct product:
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                {conflictProducts.map((prod, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleConflictSelect(prod)}
+                    className="w-full text-left p-4 rounded-xl bg-secondary hover:bg-secondary/80 border border-border transition-colors flex flex-col gap-1"
+                  >
+                    <span className="font-bold text-foreground line-clamp-1">{prod.name}</span>
+                    <span className="text-xs text-text-secondary uppercase tracking-wider font-semibold">
+                      Source: {prod.source === 'openfoodfacts' ? 'Open Food Facts' : 'UPCItemDB'}
+                    </span>
+                  </button>
+                ))}
+                
+                <div className="pt-3">
+                  <button 
+                    onClick={() => setConflictProducts(null)}
+                    className="w-full py-4 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 text-sm font-medium transition-colors"
+                    disabled={loading}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 

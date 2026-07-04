@@ -191,14 +191,14 @@ const ProfilePage = () => {
 
             <div className="mt-8 pt-6 border-t border-border">
               <label className={labelCls}>App Appearance</label>
-              <div className="mt-2 px-4 py-3 bg-foreground/5 rounded-xl flex flex-wrap gap-4 items-center justify-between border border-border">
-                <div className="flex gap-3">
+              <div className="mt-2 p-4 bg-foreground/5 rounded-xl flex flex-col sm:flex-row gap-5 sm:gap-6 sm:items-center justify-between border border-border">
+                <div className="flex gap-4 justify-center sm:justify-start w-full sm:w-auto">
                   {themes.map((t) => (
                     <button
                       key={t.id}
                       type="button"
                       onClick={() => setTheme(t.id)}
-                      className="w-8 h-8 rounded-full border-[3px] transition-transform hover:scale-110 flex items-center justify-center"
+                      className="w-10 h-10 sm:w-8 sm:h-8 rounded-full border-[3px] transition-transform active:scale-90 sm:hover:scale-110 flex items-center justify-center"
                       style={{ 
                         backgroundColor: t.color, 
                         borderColor: theme === t.id && !customAccent ? 'var(--accent)' : 'transparent' 
@@ -208,27 +208,28 @@ const ProfilePage = () => {
                     />
                   ))}
                 </div>
-                <div className="flex items-center gap-3 border-l border-border pl-4">
+                
+                <div className="flex items-center justify-center sm:justify-start gap-3 pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l border-border sm:pl-6 w-full sm:w-auto">
                   <input
                     type="color"
                     value={tempColor}
                     onChange={(e) => setTempColor(e.target.value)}
-                    className="w-8 h-8 p-0 border-0 rounded-full cursor-pointer bg-transparent"
+                    className="w-10 h-10 sm:w-8 sm:h-8 p-0 border-0 rounded-full cursor-pointer bg-transparent shrink-0"
                     title="Pick custom accent color"
                   />
                   <button
                     type="button"
                     onClick={() => setCustomAccent(tempColor)}
-                    className="w-8 h-8 bg-accent rounded-full text-foreground flex items-center justify-center transition-transform hover:scale-110 shadow-lg shadow-accent/20"
+                    className="flex-1 sm:flex-none h-10 px-4 bg-accent rounded-xl text-foreground text-sm font-bold flex items-center justify-center gap-2 transition-transform active:scale-95 sm:hover:scale-105 shadow-lg shadow-accent/20"
                     title="Apply custom accent"
                   >
-                    <Check className="w-4 h-4" />
+                    <Check className="w-4 h-4" /> <span className="sm:hidden">Apply Color</span>
                   </button>
                   {customAccent && (
                     <button
                       type="button"
                       onClick={() => setCustomAccent(null)}
-                      className="w-8 h-8 bg-red-500/10 border border-red-500/20 rounded-full text-red-500 flex items-center justify-center transition-transform hover:scale-110"
+                      className="w-10 h-10 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 flex items-center justify-center transition-transform active:scale-95 sm:hover:scale-105 shrink-0"
                       title="Reset accent color"
                     >
                       <X className="w-4 h-4" />
