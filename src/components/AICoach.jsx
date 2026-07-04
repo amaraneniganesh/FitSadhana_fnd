@@ -123,7 +123,7 @@ const AICoach = () => {
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.94 }}
         onClick={() => setIsOpen(o => !o)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl bg-accent flex items-center justify-center shadow-2xl shadow-accent/30"
+        className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-[60] w-14 h-14 rounded-2xl bg-accent flex items-center justify-center shadow-2xl shadow-accent/30"
         style={{ boxShadow: '0 0 30px var(--accent)' }}
       >
         <AnimatePresence mode="wait">
@@ -142,7 +142,7 @@ const AICoach = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-            className="fixed bottom-24 right-6 w-[340px] md:w-[400px] z-50 flex flex-col overflow-hidden rounded-3xl"
+            className="fixed bottom-36 md:bottom-24 right-4 md:right-6 w-[calc(100vw-32px)] sm:w-[340px] md:w-[400px] z-[60] flex flex-col overflow-hidden rounded-3xl"
             style={{
               height: '520px',
               maxHeight: '80vh',

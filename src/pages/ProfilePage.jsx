@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import Button from '../components/ui/Button';
 import api from '../lib/axios';
 import { useAuthStore } from '../store/useAuthStore';
-import { ArrowLeft, Plus, X, CheckCircle2, User2, Scale, Target, Dumbbell, Activity } from 'lucide-react';
+import { useThemeStore } from '../store/useThemeStore';
+import { ArrowLeft, Plus, X, CheckCircle2, User2, Scale, Target, Dumbbell, Activity, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import Sidebar from '../components/Sidebar';
 
@@ -30,6 +31,20 @@ const ProfilePage = () => {
   const [exSearch, setExSearch] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  
+  const { theme, setTheme, customAccent, setCustomAccent } = useThemeStore();
+  const [tempColor, setTempColor] = useState(customAccent || '#3b82f6');
+  
+  useEffect(() => {
+    if (!customAccent) setTempColor('#3b82f6');
+  }, [customAccent]);
+  
+  const themes = [
+    { id: 'dark', color: '#171717' },
+    { id: 'light', color: '#FFFFFF' },
+    { id: 'neon', color: '#00FFCC' },
+    { id: 'midnight', color: '#1E293B' },
+  ];
   const [activeTab, setActiveTab] = useState('stats');
 
   useEffect(() => {
@@ -171,6 +186,55 @@ const ProfilePage = () => {
                 <select className={selectCls} value={formData.experienceLevel} onChange={e => setFormData({ ...formData, experienceLevel: e.target.value })}>
                   <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
                 </select>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-border">
+              <label className={labelCls}>App Appearance</label>
+              <div className="mt-2 px-4 py-3 bg-foreground/5 rounded-xl flex flex-wrap gap-4 items-center justify-between border border-border">
+                <div className="flex gap-3">
+                  {themes.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setTheme(t.id)}
+                      className="w-8 h-8 rounded-full border-[3px] transition-transform hover:scale-110 flex items-center justify-center"
+                      style={{ 
+                        backgroundColor: t.color, 
+                        borderColor: theme === t.id && !customAccent ? 'var(--accent)' : 'transparent' 
+                      }}
+                      title={`Switch to ${t.id} mode`}
+                      aria-label={`Switch to ${t.id} mode`}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center gap-3 border-l border-border pl-4">
+                  <input
+                    type="color"
+                    value={tempColor}
+                    onChange={(e) => setTempColor(e.target.value)}
+                    className="w-8 h-8 p-0 border-0 rounded-full cursor-pointer bg-transparent"
+                    title="Pick custom accent color"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCustomAccent(tempColor)}
+                    className="w-8 h-8 bg-accent rounded-full text-foreground flex items-center justify-center transition-transform hover:scale-110 shadow-lg shadow-accent/20"
+                    title="Apply custom accent"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  {customAccent && (
+                    <button
+                      type="button"
+                      onClick={() => setCustomAccent(null)}
+                      className="w-8 h-8 bg-red-500/10 border border-red-500/20 rounded-full text-red-500 flex items-center justify-center transition-transform hover:scale-110"
+                      title="Reset accent color"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </motion.div>
